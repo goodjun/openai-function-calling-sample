@@ -1,8 +1,17 @@
+import { createChatCompletion } from "@/services/open-ai/open-ai";
 import { NextApiResponse, NextApiRequest } from "next";
 
+interface ConversationResponse {
+  message: string;
+}
+
 export default async function handler(
-  _req: NextApiRequest,
-  res: NextApiResponse
+  req: NextApiRequest,
+  res: NextApiResponse<ConversationResponse>
 ) {
-  return res.status(200).json([]);
+  const { content } = req.body;
+
+  const message = await createChatCompletion(content);
+
+  return res.status(200).json({ message: message });
 }

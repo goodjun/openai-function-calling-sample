@@ -6,13 +6,21 @@ export interface FunctionCall {
 
 export const functionCalls: FunctionCall = {
   check_stock_price: async (args) => {
-    const { data } = await axios.get("https://api.twelvedata.com/quote", {
-      params: {
-        symbol: args.symbol,
-        apikey: "",
-      },
-    });
+    try {
+      const { data } = await axios.get("https://api.twelvedata.com/quote", {
+        params: {
+          symbol: args.symbol,
+          apikey: process.env.TWELVEDATA_API_KEY,
+        },
+      });
 
-    return data;
+      console.log(data);
+
+      return `Today (${data.datetime}), the current price of ${args.symbol} is $${data.close}`;
+    } catch (error) {
+      console.error(error);
+
+      return `Some errors have occurred.`;
+    }
   },
 };

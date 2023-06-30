@@ -2,7 +2,7 @@ import { ChatCompletionFunctions, Configuration, OpenAIApi } from "openai";
 import { FunctionCall, functionCalls } from "./function-calls";
 
 const configuration = new Configuration({
-  apiKey: "",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const openai = new OpenAIApi(configuration);
@@ -24,12 +24,16 @@ const functions: ChatCompletionFunctions[] = [
   },
 ];
 
-export const createChatCompletion = async (content: string) => {
+export const createChatCompletion = async (
+  content: string
+): Promise<string> => {
   const chatCompletion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0613",
-    messages: [{ role: "user", content: "What is the stock price of Apple?" }],
+    messages: [{ role: "user", content: content }],
     functions: functions,
   });
+
+  console.log(chatCompletion.data);
 
   if (chatCompletion.data.choices[0].finish_reason === "function_call") {
     const functionCall = chatCompletion.data.choices[0].message?.function_call;
@@ -38,10 +42,11 @@ export const createChatCompletion = async (content: string) => {
 
     const functionArguments = JSON.parse(functionCall?.arguments as string);
 
-    const result = await functionCalls[functionName](functionArguments);
-
-    // TODO: return function call result
+    return functionCalls[functionName](functionArguments);
   } else {
-    // TODO: return text result
+    return (
+      chatCompletion.data.choices[0].message?.content ??
+      "Some errors have occurred."
+    );
   }
 };
