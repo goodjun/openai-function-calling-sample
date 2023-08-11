@@ -1,5 +1,6 @@
 "use client";
 
+import { DemoShareDocument } from "@/components/share-document";
 import { Spinner } from "@/components/spinner/spinner";
 import axios from "axios";
 import { useState } from "react";
@@ -7,35 +8,37 @@ import { useState } from "react";
 const postConversation = async (content: string) => {
   try {
     const response = await axios.post("/api/conversations", { content });
-
     return response.data.message;
   } catch (error) {
     console.log(error);
-
     return "Some errors have occurred.";
   }
 };
 
 export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
-
   const [input, setInput] = useState<string>("");
+  const [message, setMessage] = useState<any>("");  // Use 'any' for now, but you might want a more specific type later.
 
-  const [message, setMessage] = useState<string>("");
-
-  const handleKeyDown = async (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === "Enter" && loading === false) {
+  const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && !loading) {
       setLoading(true);
-
-      const message = await postConversation(input);
-
+      const responseMessage = await postConversation(input);
       setLoading(false);
-
-      setMessage(message);
+      setMessage(responseMessage);
     }
   };
+
+  const renderContent = () => {
+    switch (message.type) {
+      case 'text':
+        return <p className="text-gray-800 break-words p-1">{message.content}</p>;
+      case 'function-result':
+        return <DemoShareDocument />;
+      default:
+        return null;
+    }
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
@@ -62,8 +65,7 @@ export default function Home() {
         </div>
       </div>
       <div className="w-128">
-        {loading && <Spinner />}
-        {!loading && <p className="text-gray-800 break-words p-1">{message}</p>}
+        {loading ? <Spinner /> : renderContent()}
       </div>
     </main>
   );
