@@ -33,10 +33,10 @@ This is a sample project that demonstrates how to use Next.js to develop an Open
    - Create a `.env.local` file in the root of the project.
    - Add your Open AI API key to the `.env.local` file:
 
-     ```
-     TWELVEDATA_API_KEY=your twelvedata api key
-     OPENAI_API_KEY=your open ai api key
-     ```
+   ```
+   TWELVEDATA_API_KEY=your twelvedata api key
+   OPENAI_API_KEY=your open ai api key
+   ```
 
 5. Start the development server:
 
